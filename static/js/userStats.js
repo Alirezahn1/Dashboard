@@ -28,7 +28,7 @@ const updateThisMonthUI = (data = [], type = "expenses") => {
 
   const currentMonthData = data.find((item, i) => {
     const key = currentMonthNumber;
-    
+
     return item;
   });
 
