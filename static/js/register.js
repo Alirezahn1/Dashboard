@@ -25,9 +25,14 @@ emailField.addEventListener("keyup", (e) => {
   emailFeedBackArea.style.display = "none";
 
   if (emailVal.length > 0) {
-    fetch("/authentication/validate-email", {
+    fetch("/validate-email/", {
       body: JSON.stringify({ email: emailVal }),
       method: "POST",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+          "Accept": "application/json",
+          'Content-Type': 'application/json'
+        },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -55,9 +60,14 @@ usernameField.addEventListener("keyup", (e) => {
   feedBackArea.style.display = "none";
 
   if (usernameVal.length > 0) {
-    fetch("/authentication/validate-username", {
+    fetch("/validate-username/", {
       body: JSON.stringify({ username: usernameVal }),
       method: "POST",
+       headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+          "Accept": "application/json",
+          'Content-Type': 'application/json'
+        },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -73,3 +83,18 @@ usernameField.addEventListener("keyup", (e) => {
       });
   }
 });
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
