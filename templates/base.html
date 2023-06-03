@@ -30,7 +30,7 @@
         </li>
 
         <li class="nav-item text-nowrap mt-3 ml-2">
-          <form action="" method="POST">
+          <form action="{% url  'logout' %}" method="POST">
             {% csrf_token %}
             <input
               class="text text-capitalize"
@@ -46,7 +46,8 @@
       <div class="row">
         {% include 'sidebar.html' %}
 
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 ">
+        {% include 'messages.html' %}
           {% block content %} {% endblock %}
         </main>
       </div>
