@@ -1,5 +1,5 @@
 import json
-from django.contrib import messages
+from django.contrib import messages, auth
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -111,3 +111,31 @@ class EmailValidationView(View):
 #             pass
 #
 #         return redirect('login')
+
+class LoginView(View):
+    def get(self, request):
+        return render(request, 'authentication/login.html')
+
+    def post(self, request):
+        username = request.POST['username']
+        password = request.POST['password']
+
+        if username and password:
+            user = auth.authenticate(username=username, password=password)
+
+            if user:
+                if user.is_active:
+                    auth.login(request, user)
+                    messages.success(request, 'Welcome, ' +
+                                     user.username+' you are now logged in')
+                    return redirect('index')
+                # messages.error(
+                #     request, 'Account is not active,please check your email')
+                # return render(request, 'authentication/login.html')
+            messages.error(
+                request, 'Invalid credentials,try again')
+            return render(request, 'authentication/login.html')
+
+        messages.error(
+            request, 'Please fill all fields')
+        return render(request, 'authentication/login.html')
