@@ -1,7 +1,7 @@
 import json
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib.auth.models import User
@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from validate_email import validate_email
 from .utils import account_activation_token
-from django.utils.encoding import force_bytes, DjangoUnicodeDecodeError
+from django.utils.encoding import force_bytes,force_str
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
@@ -41,32 +41,32 @@ class RegistrationView(View):
 
                 user = User.objects.create_user(username=username, email=email)
                 user.set_password(password)
-                user.is_active = False
+                # user.is_active = False
                 user.save()
-                current_site = get_current_site(request)
-                email_body = {
-                    'user': user,
-                    'domain': current_site.domain,
-                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                    'token': account_activation_token.make_token(user),
-                }
-
-                link = reverse('activate', kwargs={
-                               'uidb64': email_body['uid'], 'token': email_body['token']})
-
-                email_subject = 'Activate your account'
-
-                activate_url = 'http://'+current_site.domain+link
-
-                email = EmailMessage(
-                    email_subject,
-                    'Hi '+user.username + ', Please the link below to activate your account \n'+activate_url,
-                    'noreply@semycolon.com',
-                    [email],
-                )
-                email.send(fail_silently=False)
+                # current_site = get_current_site(request)
+                # email_body = {
+                #     'user': user,
+                #     'domain': current_site.domain,
+                #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                #     'token': account_activation_token.make_token(user),
+                # }
+                #
+                # link = reverse('activate', kwargs={
+                #                'uidb64': email_body['uid'], 'token': email_body['token']})
+                #
+                # email_subject = 'Activate your account'
+                #
+                # activate_url = 'http://'+current_site.domain+link
+                #
+                # email = EmailMessage(
+                #     email_subject,
+                #     'Hi '+user.username + ', Please the link below to activate your account \n'+activate_url,
+                #     'noreply@semycolon.com',
+                #     [email],
+                # )
+                # email.send(fail_silently=False)
                 messages.success(request, 'Account successfully created')
-                return render(request, 'authentication/register.html')
+                return redirect('login')
 
         return render(request, 'authentication/register.html')
 
@@ -89,3 +89,25 @@ class EmailValidationView(View):
         if User.objects.filter(email=email).exists():
             return JsonResponse({'email_error': 'sorry email in use,choose another one '}, status=409)
         return JsonResponse({'email_valid': True})
+
+# class VerificationView(View):
+#     def get(self, request, uidb64, token):
+#         try:
+#             id = force_str(urlsafe_base64_decode(uidb64))
+#             user = User.objects.get(pk=id)
+#
+#             if not account_activation_token.check_token(user, token):
+#                 return redirect('login'+'?message='+'User already activated')
+#
+#             if user.is_active:
+#                 return redirect('login')
+#             user.is_active = True
+#             user.save()
+#
+#             messages.success(request, 'Account activated successfully')
+#             return redirect('login')
+#
+#         except Exception as ex:
+#             pass
+#
+#         return redirect('login')
