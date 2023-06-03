@@ -1,6 +1,5 @@
 import json
 from django.contrib import messages
-from django.core.validators import validate_email
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -9,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-
+from validate_email import validate_email
 from .utils import account_activation_token
 from django.utils.encoding import force_bytes, DjangoUnicodeDecodeError
 from django.core.mail import EmailMessage
