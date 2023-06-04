@@ -186,9 +186,13 @@ class CompletePasswordReset(View):
     def post(self,request,uid64,token):
         # PasswordResetTokenGenerator
         #     try:
-        #         user_id = force_str()
+        #         user_id = force_str(urlsafe_base64_decode(uid64)
+        #         user= User.objects.get(pk=user_id)
+        #         user.password = password
         #         user.save()
+        #         messages.success(request,'Password reset successful')
+        #         return redirect('login')
         #     except Exception as identifier:
-        #         pass
-        #
+        #        messages.error(request,'try again')
+
         return render(request, 'authentication/set-newpassword.html')
