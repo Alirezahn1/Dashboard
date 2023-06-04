@@ -1,14 +1,17 @@
 import json
 from django.contrib import messages, auth
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
-from django.views import View
+from django.views import View, generic
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from validate_email import validate_email
+
+from .forms import UserChangeForm
 from .utils import account_activation_token
 from django.utils.encoding import force_bytes,force_str
 from django.core.mail import EmailMessage
@@ -204,4 +207,15 @@ class EmailThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        self.email.send(fail_silently=False)
+       self.email.send(fail_silently=False)
+
+
+class UserEditView(LoginRequiredMixin,generic.UpdateView):
+    login_url = '/login/'
+    redirect_field_name = 'login'
+    form_class = UserChangeForm
+    template_name = 'authentication/profile.html'
+    success_url = reverse_lazy('expenses')
+
+    def get_object(self, queryset=None):
+        return self.request.user
