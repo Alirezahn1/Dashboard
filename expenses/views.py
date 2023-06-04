@@ -99,6 +99,7 @@ def delete_expense(request, id):
     messages.success(request, 'Expense removed')
     return redirect('expenses')
 
+@login_required
 def search_expenses(request):
     if request.method == 'POST':
         search_str = json.loads(request.body).get('searchText')
@@ -110,6 +111,7 @@ def search_expenses(request):
         data = expenses.values()
         return JsonResponse(list(data), safe=False)
 
+@login_required
 def expense_category_summary(request):
     todays_date = datetime.date.today()
     six_months_ago = todays_date-datetime.timedelta(days=30*6)
