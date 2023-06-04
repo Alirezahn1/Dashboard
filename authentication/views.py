@@ -14,7 +14,7 @@ from django.utils.encoding import force_bytes,force_str
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 class RegistrationView(View):
     def get(self, request):
@@ -145,3 +145,44 @@ class LogoutView(View):
         auth.logout(request)
         messages.success(request, 'You have been logged out')
         return redirect('login')
+
+class RequestPasswordResetEmail(View):
+    def get(self, request):
+        return render(request, 'authentication/reset-password.html')
+
+    def post(self,request):
+        email = request.POST['email']
+
+        if User.objects.filter(email=email):
+            # current_site = get_current_site(request)
+            # email_body = {
+            #     'user': user,
+            #     'domain': current_site.domain,
+            #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            #     'token': account_activation_token.make_token(user),
+            # }
+            #
+            # link = reverse('activate', kwargs={
+            #                'uidb64': email_body['uid'], 'token': email_body['token']})
+            #
+            # email_subject = 'Activate your account'
+            #
+            # activate_url = 'http://'+current_site.domain+link
+            #
+            # email = EmailMessage(
+            #     email_subject,
+            #     'Hi '+user.username + ', Please the link below to activate your account \n'+activate_url,
+            #     'noreply@semycolon.com',
+            #     [email],
+            # )
+            # email.send(fail_silently=False)
+
+            return render(request, 'authentication/reset-password.html')
+        return render(request, 'authentication/reset-password.html')
+
+class CompletePasswordReset(View):
+    def get(self, request,uid64,token):
+        return render(request, 'authentication/set-newpassword.html')
+    def post(self,request,uid64,token):
+        # PasswordResetTokenGenerator
+        return render(request, 'authentication/set-newpassword.html')
