@@ -22,6 +22,7 @@ def index(request):
     }
     return render(request, 'expenses/index.html', context)
 
+@login_required
 def add_expense(request):
     categories = Category.objects.all()
     context = {
