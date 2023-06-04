@@ -100,9 +100,9 @@ def search_income(request):
     if request.method == 'POST':
         search_str = json.loads(request.body).get('searchText')
         income = Income.objects.filter(
-            amount__istartswith=search_str, owner=request.user) | UserIncome.objects.filter(
-            date__istartswith=search_str, owner=request.user) | UserIncome.objects.filter(
-            description__icontains=search_str, owner=request.user) | UserIncome.objects.filter(
+            amount__istartswith=search_str, owner=request.user) | Income.objects.filter(
+            date__istartswith=search_str, owner=request.user) | Income.objects.filter(
+            description__icontains=search_str, owner=request.user) | Income.objects.filter(
             source__icontains=search_str, owner=request.user)
         data = income.values()
         return JsonResponse(list(data), safe=False)
