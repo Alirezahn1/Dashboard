@@ -1,6 +1,9 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from incomes.models import Source, Income
@@ -22,7 +25,7 @@ def index(request):
     }
     return render(request, 'income/index.html', context)
 
-@login_required(login_url='/authentication/login')
+@login_required
 def add_income(request):
     sources = Source.objects.all()
     context = {
@@ -92,3 +95,14 @@ def delete_income(request, id):
     income.delete()
     messages.success(request, 'record removed')
     return redirect('income')
+
+def search_income(request):
+    if request.method == 'POST':
+        search_str = json.loads(request.body).get('searchText')
+        income = Income.objects.filter(
+            amount__istartswith=search_str, owner=request.user) | UserIncome.objects.filter(
+            date__istartswith=search_str, owner=request.user) | UserIncome.objects.filter(
+            description__icontains=search_str, owner=request.user) | UserIncome.objects.filter(
+            source__icontains=search_str, owner=request.user)
+        data = income.values()
+        return JsonResponse(list(data), safe=False)
