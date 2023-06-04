@@ -91,6 +91,7 @@ def expense_edit(request, id):
 
         return redirect('expenses')
 
+@login_required
 def delete_expense(request, id):
     expense = Expense.objects.get(pk=id)
     expense.delete()
