@@ -13,7 +13,7 @@ from .utils import account_activation_token
 from django.utils.encoding import force_bytes,force_str
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-
+import threading
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 class RegistrationView(View):
@@ -64,7 +64,7 @@ class RegistrationView(View):
                 #     'noreply@semycolon.com',
                 #     [email],
                 # )
-                # email.send(fail_silently=False)
+                # EmailThread(email).start()
                 messages.success(request, 'Account successfully created')
                 return redirect('login')
 
@@ -175,7 +175,7 @@ class RequestPasswordResetEmail(View):
             #     'noreply@semycolon.com',
             #     [email],
             # )
-            # email.send(fail_silently=False)
+            # EmailThread(email).start()
 
             return render(request, 'authentication/reset-password.html')
         return render(request, 'authentication/reset-password.html')
@@ -196,3 +196,12 @@ class CompletePasswordReset(View):
         #        messages.error(request,'try again')
 
         return render(request, 'authentication/set-newpassword.html')
+
+class EmailThread(threading.Thread):
+    # speeding up sending email
+    def __init__(self,email):
+        self.email = email
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.email.send(fail_silently=False)
