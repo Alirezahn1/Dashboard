@@ -1,10 +1,11 @@
+import csv
 import datetime
 import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
 from expenses.models import Expense, Category
@@ -140,3 +141,16 @@ def expense_category_summary(request):
 @login_required
 def stats_view(request):
     return render(request, 'expenses/stats.html')
+
+@login_required
+def export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition']= 'attachment; filename = expenses'+\
+                                     str(datetime.datetime.now())+'.csv'
+    writer = csv.writer(response)
+    writer.writerow(['Amount','Category','Description','Date'])
+    expenses = Expense.objects.filter(owner=request.user)
+    for expense in expenses:
+        writer.writerow([expense.amount,expense.category,expense.description,expense.date])
+
+    return response
