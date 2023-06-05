@@ -2,6 +2,7 @@ import csv
 import datetime
 import json
 
+import xlwt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -150,4 +151,30 @@ def export_csv(request):
     for income in incomes:
         writer.writerow([income.amount,income.source,income.description,income.date])
 
+    return response
+
+def export_excel(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename = Income' + \
+                                      str(datetime.datetime.now()) + '.xls'
+    vb = xlwt.Workbook(encoding='utf-8')
+    ws = vb.add_sheet('Expenses')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    columns = ['Amount', 'Source', 'Description', 'Date']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    font_style = xlwt.XFStyle()
+
+    rows = Income.objects.filter(owner=request.user).values_list('amount', 'source', 'description', 'date')
+    for row in rows:
+        row_num += 1
+
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, str(row[col_num]), font_style)
+
+    vb.save(response)
     return response

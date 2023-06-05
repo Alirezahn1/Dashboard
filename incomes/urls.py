@@ -15,6 +15,7 @@ path('income_source_summary', views.income_source_summary,
     path('stats2', views.stats_view,
          name="stats2"),
     path('export-csv2', views.export_csv,
-         name="export-csv2")
+         name="export-csv2"),
+    path('export-excel2',views.export_excel,name='export-excel2')
 
 ]
