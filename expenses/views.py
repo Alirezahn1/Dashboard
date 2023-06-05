@@ -1,13 +1,17 @@
 import csv
 import datetime
 import json
+import tempfile
 
 import xlwt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 from expenses.models import Expense, Category
 from userpreferences.models import UserPreference
@@ -189,4 +193,23 @@ def export_excel(request):
             ws.write(row_num, col_num, str(row[col_num]), font_style)
 
     vb.save(response)
+    return response
+
+def export_pdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; attachment; filename = Expenses' + \
+                                      str(datetime.datetime.now()) + '.pdf'
+    response['Content-Transfer-Encoding']= 'binary'
+    expenses = Expense.objects.filter(owner=request.user)
+    sum = expenses.aggregate(Sum('amount'))
+
+    html_string= render_to_string('expenses/pdf-output.html',{'expenses':expenses,'total':sum['amount__sum']})
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+
+        output= open(output.name,'rb')
+        response.write(output.read())
     return response
