@@ -6,6 +6,7 @@ import tempfile
 import xlwt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.core.paginator import Paginator
 from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
@@ -13,7 +14,7 @@ from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from weasyprint import HTML
 
-from expenses.models import Expense, Category
+from expenses.models import Expense, Category, Order
 from userpreferences.models import UserPreference
 
 
@@ -215,3 +216,10 @@ def export_pdf(request):
     return response
 
 
+def dashboard_with_pivot(request):
+    return render(request, 'expenses/pivot.html', {})
+
+def pivot_data(request):
+    dataset = Order.objects.all()
+    data = serializers.serialize('json', dataset)
+    return JsonResponse(data, safe=False)
