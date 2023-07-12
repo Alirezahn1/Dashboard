@@ -8,4 +8,5 @@
 - Analyse Data with Chart js <br>
 - Export to PDF and Excel and CSV <br>
 - Search in income and expenses <br>
-- validate username <br>
+- validate username with js <br>
+- deployment with Heroku <br>
