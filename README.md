@@ -1,8 +1,8 @@
 # Dashboard
 **This is a simple income expense dashboard built with Django and js**
 <hr>
-
-# Features  <br>
+<br>
+ ***Features***  <br>
 - Dynamic Dashboard for income epense managment <br>
 - Choose userprefrence currency <br>
 - Analyse Data with Chart js <br>
